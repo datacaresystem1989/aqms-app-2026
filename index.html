@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AQMS — Patient Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:       #0B1F3A;
+  --navy-mid:   #122848;
+  --navy-light: #1A3560;
+  --gold:       #C8A84B;
+  --gold-light: #E8D28A;
+  --gold-bg:    #FBF6E9;
+  --white:      #FFFFFF;
+  --off-white:  #F7F8FA;
+  --grey-50:    #F0F2F5;
+  --grey-100:   #E2E6EC;
+  --grey-300:   #B0BAC8;
+  --grey-500:   #6B7A90;
+  --grey-700:   #3A4558;
+  --green:      #1B7A4A;
+  --green-bg:   #E8F7EF;
+  --green-bd:   #A3D9BC;
+  --red:        #C0392B;
+  --red-bg:     #FDECEA;
+  --red-bd:     #F5B8B3;
+  --blue-bg:    #EBF1FB;
+  --blue-bd:    #B8CCF0;
+  --blue:       #1A4FA0;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:  'Source Sans 3',sans-serif;
+  --font-mono:  'Source Code Pro',monospace;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:20px;
+  --shadow-sm:0 1px 3px rgba(11,31,58,.08),0 1px 2px rgba(11,31,58,.05);
+  --shadow-md:0 4px 12px rgba(11,31,58,.10),0 2px 4px rgba(11,31,58,.06);
+  --shadow-lg:0 16px 40px rgba(11,31,58,.18),0 4px 12px rgba(11,31,58,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font-body);background:var(--off-white);color:var(--navy);min-height:100vh;display:flex;flex-direction:column;font-size:15px;line-height:1.5;}
+
+/* HEADER */
+.header{background:var(--navy);padding:0 40px;display:flex;align-items:stretch;height:72px;position:relative;}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 50%,var(--gold) 100%);}
+.header-logo{display:flex;align-items:center;gap:16px;flex:1;}
+.logo-mark{width:44px;height:44px;background:var(--gold);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-mark svg{width:26px;height:26px;}
+.hospital-name{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--white);line-height:1.1;letter-spacing:.01em;}
+.hospital-sub{font-size:11px;font-weight:400;color:var(--grey-300);letter-spacing:.08em;text-transform:uppercase;}
+.header-center{display:flex;align-items:center;}
+.page-title-pill{background:var(--navy-light);border:1px solid rgba(200,168,75,.3);border-radius:30px;padding:6px 20px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-light);}
+.header-right{display:flex;align-items:center;gap:24px;margin-left:auto;}
+.header-clock{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--white);letter-spacing:.04em;}
+.header-date{font-size:11px;color:var(--grey-300);letter-spacing:.04em;text-align:right;line-height:1.3;}
+.api-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--grey-300);}
+.api-pill.ready{border-color:rgba(27,122,74,.5);color:#6EDBA8;}
+.api-pill.error{border-color:rgba(192,57,43,.5);color:#F08070;}
+.api-dot{width:6px;height:6px;border-radius:50%;background:var(--grey-300);}
+.api-pill.ready .api-dot{background:#6EDBA8;animation:blink 2s infinite;}
+.api-pill.error .api-dot{background:#F08070;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* LANG BAR */
+.lang-bar{background:var(--navy-mid);border-bottom:1px solid rgba(255,255,255,.07);padding:0 40px;display:flex;align-items:center;height:52px;gap:20px;}
+.lang-bar-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey-300);flex-shrink:0;}
+.lang-divider{width:1px;height:24px;background:rgba(255,255,255,.12);}
+.lang-options{display:flex;gap:4px;}
+.lang-btn{padding:6px 22px;border-radius:4px;border:1px solid transparent;background:transparent;font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--grey-300);cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--white);background:rgba(255,255,255,.06);}
+.lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600;border-color:var(--gold);}
+.lang-bar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.step-indicator{display:flex;align-items:center;gap:6px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:background .3s;}
+.step-dot.active{background:var(--gold);}
+.step-dot.done{background:#6EDBA8;}
+
+/* BODY */
+.page-body{flex:1;display:grid;grid-template-columns:1fr 360px;min-height:0;}
+
+/* LEFT */
+.left-panel{padding:28px 32px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;border-right:1px solid var(--grey-100);}
+.left-panel::-webkit-scrollbar{width:4px;}
+.left-panel::-webkit-scrollbar-thumb{background:var(--grey-100);border-radius:4px;}
+
+/* SECTION */
+.section{background:var(--white);border:1px solid var(--grey-100);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);}
+.section-head{background:var(--navy);padding:11px 18px;display:flex;align-items:center;gap:10px;}
+.section-icon{width:26px;height:26px;background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.3);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-icon svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.section-head-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--white);}
+.section-head-req{margin-left:auto;font-size:10px;color:var(--grey-300);letter-spacing:.06em;}
+.section-body{padding:18px 20px;}
+
+/* FORM */
+.field-label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--grey-500);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;}
+.label-native{font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--grey-300);}
+.field-input{width:100%;height:52px;padding:0 16px;border:1.5px solid var(--grey-100);border-radius:var(--r-md);font-family:var(--font-body);font-size:18px;font-weight:400;color:var(--navy);background:var(--off-white);outline:none;transition:border-color .15s,box-shadow .15s;}
+.field-input:focus{border-color:var(--navy);background:var(--white);box-shadow:0 0 0 3px rgba(11,31,58,.06);}
+.hint-row{margin-top:8px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey-300);}
+.hint-row svg{width:13px;height:13px;flex-shrink:0;}
+
+/* TRANSLIT */
+.translit-box{display:none;margin-top:10px;border:1.5px solid var(--blue-bd);border-radius:var(--r-md);background:var(--blue-bg);overflow:hidden;animation:slideDown .2s ease;}
+.translit-box.show{display:block;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.translit-top{padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.translit-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);}
+.translit-roman{font-size:14px;color:var(--grey-500);}
+.t-arrow{color:var(--grey-300);font-size:14px;}
+.translit-native{font-size:22px;font-weight:600;color:var(--navy);flex:1;}
+.translit-actions{border-top:1px solid var(--blue-bd);padding:10px 16px;display:flex;gap:8px;background:rgba(255,255,255,.5);}
+.btn-accept{flex:1;height:36px;background:var(--navy);color:var(--white);border:none;border-radius:var(--r-sm);font-family:var(--font-body);font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;}
+.btn-accept:hover{opacity:.85;}
+.btn-discard{height:36px;padding:0 16px;background:transparent;color:var(--grey-500);border:1.5px solid var(--grey-100);border-radius:var(--r-sm);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:background .15s;}
+.btn-discard:hover{background:var(--white);}
+.accepted-box{display:none;margin-top:10px;border:1.5px solid var(--green-bd);border-radius:var(--r-md);background:var(--green-bg);padding:12px 16px;align-items:center;gap:12px;}
+.accepted-box.show{display:flex;}
+.accepted-check{width:24px;height:24px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.accepted-check svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.accepted-name-val{font-size:22px;font-weight:600;color:var(--green);flex:1;}
+.btn-edit-name{font-size:12px;font-weight:600;color:var(--grey-500);background:none;border:none;cursor:pointer;font-family:var(--font-body);padding:4px 8px;border-radius:4px;transition:background .15s;}
+.btn-edit-name:hover{background:rgba(0,0,0,.05);}
+
+/* OPD GRID */
+.opd-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.opd-option{border:1.5px solid var(--grey-100);border-radius:var(--r-md);padding:11px 13px;cursor:pointer;transition:all .15s;background:var(--off-white);display:flex;align-items:center;gap:10px;user-select:none;}
+.opd-option:hover{border-color:var(--navy);background:var(--white);}
+.opd-option.selected{border-color:var(--navy);background:var(--navy);color:var(--white);}
+.opd-code{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--gold);background:rgba(200,168,75,.12);border-radius:4px;padding:2px 6px;letter-spacing:.08em;flex-shrink:0;}
+.opd-option.selected .opd-code{background:rgba(200,168,75,.2);}
+.opd-name{font-size:13px;font-weight:500;}
+.opd-name-native{font-size:11px;color:var(--grey-300);margin-top:1px;}
+.opd-option.selected .opd-name-native{color:rgba(255,255,255,.55);}
+
+/* RIGHT */
+.right-panel{background:var(--white);display:flex;flex-direction:column;}
+.right-head{background:var(--navy);padding:18px 22px;border-bottom:2px solid var(--gold);}
+.right-head-title{font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--white);margin-bottom:2px;}
+.right-head-sub{font-size:11px;color:var(--grey-300);letter-spacing:.04em;}
+.numpad-card{padding:16px 22px;border-bottom:1px solid var(--grey-100);}
+.numpad-field-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--grey-500);margin-bottom:7px;}
+.numpad-display{width:100%;height:50px;border:1.5px solid var(--grey-100);border-radius:var(--r-md);background:var(--off-white);display:flex;align-items:center;padding:0 14px;margin-bottom:9px;gap:8px;}
+.numpad-display-prefix{font-family:var(--font-mono);font-size:13px;color:var(--grey-300);flex-shrink:0;}
+.numpad-display-value{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--navy);letter-spacing:.08em;flex:1;}
+.numpad-display-value.empty{font-size:14px;font-weight:400;color:var(--grey-300);font-family:var(--font-body);letter-spacing:0;}
+.numpad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.num-btn{height:42px;border:1.5px solid var(--grey-100);border-radius:var(--r-sm);background:var(--white);font-family:var(--font-mono);font-size:17px;font-weight:600;color:var(--navy);cursor:pointer;transition:all .12s;user-select:none;display:flex;align-items:center;justify-content:center;}
+.num-btn:hover{background:var(--off-white);border-color:var(--grey-300);}
+.num-btn:active{transform:scale(.95);background:var(--grey-50);}
+.num-btn.span2{grid-column:span 2;font-family:var(--font-body);font-size:14px;font-weight:600;}
+.num-btn.del{color:var(--grey-500);font-size:15px;font-family:var(--font-body);}
+.num-btn.del:hover{color:var(--red);border-color:var(--red-bd);background:var(--red-bg);}
+
+/* VALIDATION */
+.validation-panel{padding:14px 22px;flex:1;display:flex;flex-direction:column;gap:7px;}
+.val-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--grey-500);margin-bottom:3px;}
+.val-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--r-sm);border:1px solid var(--grey-100);background:var(--off-white);font-size:13px;transition:all .2s;}
+.val-row.ok{border-color:var(--green-bd);background:var(--green-bg);}
+.val-row.ok .val-label{color:var(--green);}
+.val-icon{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--grey-300);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.val-row.ok .val-icon{background:var(--green);border-color:var(--green);}
+.val-icon svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.val-label{font-weight:500;flex:1;}
+.val-value{font-size:11px;color:var(--grey-500);font-family:var(--font-mono);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.val-row.ok .val-value{color:var(--green);}
+
+/* SUBMIT */
+.submit-section{padding:14px 22px;border-top:1px solid var(--grey-100);}
+.submit-btn{width:100%;height:54px;border-radius:var(--r-md);border:none;background:var(--navy);color:var(--white);font-family:var(--font-body);font-size:16px;font-weight:600;letter-spacing:.03em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .18s;position:relative;overflow:hidden;}
+.submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(200,168,75,.15));}
+.submit-btn:hover:not(:disabled){background:var(--navy-light);transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.submit-btn:active:not(:disabled){transform:translateY(0);}
+.submit-btn:disabled{opacity:.35;cursor:not-allowed;}
+.submit-btn svg{width:20px;height:20px;position:relative;}
+.submit-btn-label{position:relative;}
+.submit-note{font-size:11px;color:var(--grey-300);text-align:center;margin-top:7px;letter-spacing:.03em;}
+
+/* TOKEN MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(11,31,58,.72);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.token-modal{background:var(--white);border-radius:var(--r-xl);width:440px;overflow:hidden;box-shadow:var(--shadow-lg);animation:modalPop .28s cubic-bezier(.34,1.56,.64,1);}
+@keyframes modalPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.token-modal-head{background:var(--navy);padding:28px 32px 22px;text-align:center;position:relative;}
+.token-modal-head::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));}
+.token-modal-greeting{font-size:13px;color:var(--grey-300);margin-bottom:2px;letter-spacing:.02em;}
+.token-modal-name{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--white);margin-bottom:18px;}
+.token-badge-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--grey-300);margin-bottom:6px;}
+.token-number-ring{display:inline-flex;align-items:center;justify-content:center;width:128px;height:128px;border-radius:50%;border:3px solid var(--gold);background:rgba(200,168,75,.08);margin-bottom:10px;}
+.token-number{font-family:var(--font-mono);font-size:40px;font-weight:600;color:var(--gold);letter-spacing:.02em;}
+.token-dept-name{font-size:13px;color:var(--grey-300);letter-spacing:.04em;}
+.token-modal-body{padding:22px 28px;}
+.token-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.tib{background:var(--off-white);border:1px solid var(--grey-100);border-radius:var(--r-md);padding:11px;text-align:center;}
+.tib-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--grey-300);margin-bottom:4px;}
+.tib-val{font-size:14px;font-weight:600;color:var(--navy);font-family:var(--font-mono);}
+.token-actions{display:flex;gap:10px;}
+.btn-print-tok{flex:1;height:46px;background:var(--navy);color:var(--white);border:none;border-radius:var(--r-md);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;}
+.btn-print-tok:hover{opacity:.85;}
+.btn-new-tok{flex:1;height:46px;background:var(--white);color:var(--navy);border:1.5px solid var(--grey-100);border-radius:var(--r-md);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
+.btn-new-tok:hover{background:var(--off-white);}
+.btn-print-tok svg,.btn-new-tok svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
+#print-area{display:none;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 26 26" fill="none">
+        <rect x="2" y="2" width="22" height="22" rx="4" fill="var(--navy)"/>
+        <line x1="13" y1="7" x2="13" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="7" y1="13" x2="19" y2="13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hospital-name">City General Hospital</div>
+      <div class="hospital-sub">Automatic Queue Management System</div>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="page-title-pill">Patient Registration</div>
+  </div>
+  <div class="header-right">
+    <div>
+      <div class="header-clock" id="clock">--:-- --</div>
+      <div class="header-date" id="date-display">--- --, ----</div>
+    </div>
+    <div class="api-pill" id="api-pill">
+      <div class="api-dot" id="api-dot"></div>
+      <span id="api-text">Connecting</span>
+    </div>
+  </div>
+</header>
+
+<div class="lang-bar">
+  <span class="lang-bar-label">Language</span>
+  <div class="lang-divider"></div>
+  <div class="lang-options">
+    <button class="lang-btn active" onclick="setLang('en',this)">English</button>
+    <button class="lang-btn" onclick="setLang('hi',this)">हिंदी</button>
+    <button class="lang-btn" onclick="setLang('bn',this)">বাংলা</button>
+	<button class="lang-btn" onclick="setLang('kn',this)">ಕನ್ನಡ</button>
+  </div>
+  <div class="lang-bar-right">
+    <span id="step-label-text" style="font-size:11px;color:var(--grey-300);letter-spacing:.06em;text-transform:uppercase;">Fill all fields to proceed</span>
+    <div class="step-indicator">
+      <div class="step-dot active" id="sd1"></div>
+      <div class="step-dot" id="sd2"></div>
+      <div class="step-dot" id="sd3"></div>
+      <div class="step-dot" id="sd4"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+  <!-- LEFT -->
+  <div class="left-panel">
+    <!-- NAME -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon">
+          <svg viewBox="0 0 15 15"><circle cx="7.5" cy="5" r="3"/><path d="M2 13c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
+        </div>
+        <span class="section-head-title" id="sh-name">Patient Name</span>
+        <span class="section-head-req">Required</span>
+      </div>
+      <div class="section-body">
+        <div class="field-label">
+          <span id="lbl-name">Full Name</span>
+          <span class="label-native" id="lbl-name-native"></span>
+        </div>
+        <input type="text" class="field-input" id="name-input"
+          placeholder="Type name here..." autocomplete="off"
+          oninput="handleName(this.value)"/>
+        <div class="translit-box" id="translit-box">
+          <div class="translit-top">
+            <span class="translit-label">Suggestion</span>
+            <span class="translit-roman" id="ts-roman"></span>
+            <span class="t-arrow">→</span>
+            <span class="translit-native" id="ts-native"></span>
+          </div>
+          <div class="translit-actions">
+            <button class="btn-accept" onclick="acceptTranslit()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 7 5.5 10.5 11 3"/></svg>
+              Accept
+            </button>
+            <button class="btn-discard" onclick="discardTranslit()">Discard</button>
+          </div>
+        </div>
+        <div class="accepted-box" id="accepted-box">
+          <div class="accepted-check">
+            <svg viewBox="0 0 13 13"><polyline points="2 7 5.5 10.5 11 3"/></svg>
+          </div>
+          <span class="accepted-name-val" id="accepted-name-val"></span>
+          <button class="btn-edit-name" onclick="editName()">Edit</button>
+        </div>
+        <div class="hint-row">
+          <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="5.5"/><line x1="6.5" y1="5.5" x2="6.5" y2="9.5"/><circle cx="6.5" cy="3.8" r=".5" fill="currentColor"/></svg>
+          <span id="hint-text">Type name in English — converts automatically to selected language</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPD -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon">
+          <svg viewBox="0 0 15 15"><rect x="2" y="2" width="11" height="11" rx="2"/><line x1="5" y1="7.5" x2="10" y2="7.5"/><line x1="7.5" y1="5" x2="7.5" y2="10"/></svg>
+        </div>
+        <span class="section-head-title" id="sh-opd">Department (OPD)</span>
+        <span class="section-head-req">Required</span>
+      </div>
+      <div class="section-body">
+        <div class="field-label"><span id="lbl-opd">Select your department</span></div>
+        <div class="opd-grid" id="opd-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="right-head">
+      <div class="right-head-title" id="rh-title">Patient Details</div>
+      <div class="right-head-sub" id="rh-sub">Enter age and contact number</div>
+    </div>
+
+    <div class="numpad-card">
+      <div class="numpad-field-label" id="npl-age">Age (Years)</div>
+      <div class="numpad-display">
+        <div class="numpad-display-value empty" id="age-disp">—</div>
+        <span style="font-size:11px;color:var(--grey-300);font-family:var(--font-body);" id="age-unit">yrs</span>
+      </div>
+      <div class="numpad-grid">
+        <button class="num-btn" onclick="np('age','1')">1</button>
+        <button class="num-btn" onclick="np('age','2')">2</button>
+        <button class="num-btn" onclick="np('age','3')">3</button>
+        <button class="num-btn" onclick="np('age','4')">4</button>
+        <button class="num-btn" onclick="np('age','5')">5</button>
+        <button class="num-btn" onclick="np('age','6')">6</button>
+        <button class="num-btn" onclick="np('age','7')">7</button>
+        <button class="num-btn" onclick="np('age','8')">8</button>
+        <button class="num-btn" onclick="np('age','9')">9</button>
+        <button class="num-btn span2" onclick="np('age','0')">0</button>
+        <button class="num-btn del" onclick="nd('age')">⌫</button>
+      </div>
+    </div>
+
+    <div class="numpad-card">
+      <div class="numpad-field-label" id="npl-phone">Mobile Number</div>
+      <div class="numpad-display">
+        <div class="numpad-display-prefix">+91</div>
+        <div class="numpad-display-value empty" id="phone-disp">— — — — — — — — — —</div>
+      </div>
+      <div class="numpad-grid">
+        <button class="num-btn" onclick="np('phone','1')">1</button>
+        <button class="num-btn" onclick="np('phone','2')">2</button>
+        <button class="num-btn" onclick="np('phone','3')">3</button>
+        <button class="num-btn" onclick="np('phone','4')">4</button>
+        <button class="num-btn" onclick="np('phone','5')">5</button>
+        <button class="num-btn" onclick="np('phone','6')">6</button>
+        <button class="num-btn" onclick="np('phone','7')">7</button>
+        <button class="num-btn" onclick="np('phone','8')">8</button>
+        <button class="num-btn" onclick="np('phone','9')">9</button>
+        <button class="num-btn span2" onclick="np('phone','0')">0</button>
+        <button class="num-btn del" onclick="nd('phone')">⌫</button>
+      </div>
+    </div>
+
+    <div class="validation-panel">
+      <div class="val-title" id="vt-title">Checklist</div>
+      <div class="val-row" id="v-name">
+        <div class="val-icon"><svg viewBox="0 0 10 10"><polyline points="2 5.5 4 8 8 2"/></svg></div>
+        <span class="val-label" id="v-name-lbl">Name</span>
+        <span class="val-value" id="v-name-val">—</span>
+      </div>
+      <div class="val-row" id="v-age">
+        <div class="val-icon"><svg viewBox="0 0 10 10"><polyline points="2 5.5 4 8 8 2"/></svg></div>
+        <span class="val-label" id="v-age-lbl">Age</span>
+        <span class="val-value" id="v-age-val">—</span>
+      </div>
+      <div class="val-row" id="v-phone">
+        <div class="val-icon"><svg viewBox="0 0 10 10"><polyline points="2 5.5 4 8 8 2"/></svg></div>
+        <span class="val-label" id="v-phone-lbl">Phone</span>
+        <span class="val-value" id="v-phone-val">—</span>
+      </div>
+      <div class="val-row" id="v-opd">
+        <div class="val-icon"><svg viewBox="0 0 10 10"><polyline points="2 5.5 4 8 8 2"/></svg></div>
+        <span class="val-label" id="v-opd-lbl">Department</span>
+        <span class="val-value" id="v-opd-val">—</span>
+      </div>
+    </div>
+
+    <div class="submit-section">
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="14" height="14" rx="3"/>
+          <polyline points="7 10 9 12 13 8"/>
+        </svg>
+        <span class="submit-btn-label" id="submit-lbl">Generate Token</span>
+      </button>
+      <div class="submit-note" id="submit-note">Complete all fields above to generate your token</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOKEN MODAL -->
+<div class="overlay" id="overlay">
+  <div class="token-modal">
+    <div class="token-modal-head">
+      <div class="token-modal-greeting" id="tok-greeting">Dear</div>
+      <div class="token-modal-name" id="tok-name">—</div>
+      <div class="token-badge-label" id="tok-badge-lbl">Your Token Number</div>
+      <div class="token-number-ring">
+        <div class="token-number" id="tok-number">—</div>
+      </div>
+      <div class="token-dept-name" id="tok-dept">—</div>
+    </div>
+    <div class="token-modal-body">
+      <div class="token-info-grid">
+        <div class="tib"><div class="tib-label" id="tib-age-lbl">Age</div><div class="tib-val" id="tib-age">—</div></div>
+        <div class="tib"><div class="tib-label" id="tib-phone-lbl">Phone</div><div class="tib-val" id="tib-phone">—</div></div>
+        <div class="tib"><div class="tib-label" id="tib-time-lbl">Time</div><div class="tib-val" id="tib-time">—</div></div>
+      </div>
+      <div class="token-actions">
+        <button class="btn-print-tok" onclick="doPrint()">
+          <svg viewBox="0 0 16 16"><rect x="3" y="6" width="10" height="7" rx="1.5"/><path d="M5 6V3h6v3"/><line x1="5" y1="10" x2="11" y2="10"/><line x1="5" y1="12" x2="9" y2="12"/></svg>
+          <span id="btn-print-lbl">Print Token</span>
+        </button>
+        <button class="btn-new-tok" onclick="resetForm()">
+          <svg viewBox="0 0 16 16"><polyline points="2 8 2 3 7 3"/><path d="M2 3 A7 7 0 1 1 2 13"/></svg>
+          <span id="btn-new-lbl">New Patient</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="print-area">
+  <div style="font-family:monospace;padding:16px;max-width:280px;text-align:center;">
+    <div style="font-size:14px;font-weight:bold;margin-bottom:2px;">CITY GENERAL HOSPITAL</div>
+    <div style="font-size:10px;margin-bottom:10px;border-bottom:1px dashed #000;padding-bottom:6px;" id="pr-dept"></div>
+    <div style="font-size:10px;">Token Number</div>
+    <div style="font-size:52px;font-weight:bold;line-height:1;margin:4px 0;" id="pr-token"></div>
+    <div style="font-size:12px;margin-bottom:10px;" id="pr-name"></div>
+    <div style="font-size:10px;border-top:1px dashed #000;padding-top:6px;" id="pr-details"></div>
+    <div style="font-size:10px;margin-top:4px;" id="pr-time"></div>
+  </div>
+</div>
+
+<script>
+const DEPTS=[
+	{code:'CARD',en:'Cardiology', hi:'हृदय रोग', bn:'কার্ডিওলজি', kn:'ಹೃದಯ ರೋಗ'},
+	{code:'NEUR',en:'Neurology', hi:'तंत्रिका विज्ञान', bn:'নিউরোলজি', kn:'ನರಶಾಸ್ತ್ರ'},
+	{code:'GENM',en:'General Medicine', hi:'सामान्य चिकित्सा', bn:'সাধারণ চিকিৎসা', kn:'ಸಾಮಾನ್ಯ ವೈದ್ಯಕೀಯ'},
+	{code:'OPHT',en:'Ophthalmology', hi:'नेत्र विज्ञान', bn:'চক্ষুবিদ্যা', kn:'ಕಣ್ಣಿನ ವೈದ್ಯಕೀಯ'},
+	{code:'ORTH',en:'Orthopaedics', hi:'हड्डी रोग', bn:'অর্থোপেডিক্স', kn:'ಅಸ್ಥಿ ಚಿಕಿತ್ಸೆ'},
+	{code:'DERM',en:'Dermatology', hi:'त्वचा रोग', bn:'চর্মরোগ', kn:'ಚರ್ಮ ರೋಗ'},
+	{code:'PEDI',en:'Paediatrics', hi:'बाल चिकित्सा', bn:'শিশুরোগ', kn:'ಮಕ್ಕಳ ವೈದ್ಯಕೀಯ'},
+	{code:'GYNA',en:'Gynaecology', hi:'स्त्री रोग', bn:'স্ত্রীরোগ', kn:'ಸ್ತ್ರೀರೋಗ'},
+	{code:'ENT', en:'ENT', hi:'कान-नाक-गला', bn:'কান-নাক-গলা', kn:'ಕಿವಿ-ಮೂಗು-ಕಂಠ'},
+	{code:'DENT',en:'Dental', hi:'दंत चिकित्सा', bn:'দন্তচিকিৎসা', kn:'ದಂತ ವೈದ್ಯಕೀಯ'},
+];
+
+const LABELS={
+  en:{shName:'Patient Name',shOpd:'Department (OPD)',lblName:'Full Name',lblNameNative:'',lblOpd:'Select your department',hintText:'Type name in English — converts automatically to selected language',rhTitle:'Patient Details',rhSub:'Enter age and contact number',nplAge:'Age (Years)',nplPhone:'Mobile Number',vtTitle:'Checklist',vNameLbl:'Name',vAgeLbl:'Age',vPhoneLbl:'Phone',vOpdLbl:'Department',submitLbl:'Generate Token',submitNote:'Complete all fields above to generate your token',greeting:'Dear',tokBadge:'Your Token Number',tibAge:'Age',tibPhone:'Phone',tibTime:'Time',btnPrint:'Print Token',btnNew:'New Patient',stepLabel:'Fill all fields to proceed'},
+  hi:{shName:'रोगी का नाम',shOpd:'विभाग (OPD)',lblName:'पूरा नाम',lblNameNative:'(नाम)',lblOpd:'विभाग चुनें',hintText:'अंग्रेज़ी में टाइप करें — हिंदी में अपने आप बदल जाएगा',rhTitle:'रोगी विवरण',rhSub:'आयु और संपर्क नंबर दर्ज करें',nplAge:'आयु (वर्ष)',nplPhone:'मोबाइल नंबर',vtTitle:'जाँच सूची',vNameLbl:'नाम',vAgeLbl:'आयु',vPhoneLbl:'फ़ोन',vOpdLbl:'विभाग',submitLbl:'टोकन लें',submitNote:'टोकन के लिए सभी जानकारी भरें',greeting:'प्रिय',tokBadge:'आपका टोकन नंबर',tibAge:'आयु',tibPhone:'फ़ोन',tibTime:'समय',btnPrint:'प्रिंट करें',btnNew:'नया मरीज़',stepLabel:'सभी जानकारी भरें'},
+  bn:{shName:'রোগীর নাম',shOpd:'বিভাগ (OPD)',lblName:'পূর্ণ নাম',lblNameNative:'(নাম)',lblOpd:'বিভাগ বেছে নিন',hintText:'ইংরেজিতে টাইপ করুন — স্বয়ংক্রিয়ভাবে বাংলায় রূপান্তরিত হবে',rhTitle:'রোগীর তথ্য',rhSub:'বয়স ও মোবাইল নম্বর দিন',nplAge:'বয়স (বছর)',nplPhone:'মোবাইল নম্বর',vtTitle:'তালিকা',vNameLbl:'নাম',vAgeLbl:'বয়স',vPhoneLbl:'ফোন',vOpdLbl:'বিভাগ',submitLbl:'টোকেন নিন',submitNote:'টোকেন পেতে সব তথ্য পূরণ করুন',greeting:'প্রিয়',tokBadge:'আপনার টোকেন নম্বর',tibAge:'বয়স',tibPhone:'ফোন',tibTime:'সময়',btnPrint:'প্রিন্ট করুন',btnNew:'নতুন রোগী',stepLabel:'সব তথ্য পূরণ করুন'},
+	kn:{
+	  shName:'ರೋಗಿಯ ಹೆಸರು',
+	  shOpd:'ವಿಭಾಗ (OPD)',
+	  lblName:'ಪೂರ್ಣ ಹೆಸರು',
+	  lblNameNative:'(ಹೆಸರು)',
+	  lblOpd:'ವಿಭಾಗ ಆಯ್ಕೆಮಾಡಿ',
+	  hintText:'ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ — ಕನ್ನಡಕ್ಕೆ ಸ್ವಯಂ ಪರಿವರ್ತನೆ ಆಗುತ್ತದೆ',
+	  rhTitle:'ರೋಗಿಯ ವಿವರಗಳು',
+	  rhSub:'ವಯಸ್ಸು ಮತ್ತು ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ',
+	  nplAge:'ವಯಸ್ಸು (ವರ್ಷ)',
+	  nplPhone:'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',
+	  vtTitle:'ಪರಿಶೀಲನಾ ಪಟ್ಟಿ',
+	  vNameLbl:'ಹೆಸರು',
+	  vAgeLbl:'ವಯಸ್ಸು',
+	  vPhoneLbl:'ಫೋನ್',
+	  vOpdLbl:'ವಿಭಾಗ',
+	  submitLbl:'ಟೋಕನ್ ಪಡೆಯಿರಿ',
+	  submitNote:'ಟೋಕನ್ ಪಡೆಯಲು ಎಲ್ಲಾ ಮಾಹಿತಿ ತುಂಬಿ',
+	  greeting:'ಪ್ರಿಯ',
+	  tokBadge:'ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ',
+	  tibAge:'ವಯಸ್ಸು',
+	  tibPhone:'ಫೋನ್',
+	  tibTime:'ಸಮಯ',
+	  btnPrint:'ಮುದ್ರಿಸಿ',
+	  btnNew:'ಹೊಸ ರೋಗಿ',
+	  stepLabel:'ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ತುಂಬಿ'
+	}
+};
+
+let S={lang:'en',acceptedName:'',age:'',phone:'',opd:'',translitResult:'',tokenCounters:{}};
+
+// CLOCK
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  document.getElementById('date-display').textContent=n.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+setInterval(tick,1000);tick();
+
+// OPD	
+function buildOpdGrid(){
+  const g=document.getElementById('opd-grid');g.innerHTML='';
+  DEPTS.forEach(d=>{
+    const div=document.createElement('div');
+    div.className='opd-option'+(S.opd===d.code?' selected':'');
+    div.onclick=()=>selectOpd(d.code);
+    const native=S.lang!=='en'?d[S.lang]:'';
+    div.innerHTML=`<div><div class="opd-code">${d.code}</div></div><div><div class="opd-name">${d.en}</div>${native?`<div class="opd-name-native">${native}</div>`:''}</div>`;
+    g.appendChild(div);
+  });
+}
+function selectOpd(code){S.opd=code;buildOpdGrid();validate();}
+
+// TRANSLIT
+const LANG_CODES={hi:'hi-t-i0-und',bn:'bn-t-i0-und', kn:'kn-t-i0-und'
+};
+let tlTimer=null;
+async function fetchTranslit(text,lang){
+  if(!text||lang==='en')return null;
+  const code=LANG_CODES[lang];if(!code)return null;
+  const url=`https://inputtools.google.com/request?text=${encodeURIComponent(text)}&itc=${code}&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8`;
+  try{const r=await fetch(url);const d=await r.json();if(d&&d[0]==='SUCCESS'&&d[1]&&d[1][0]&&d[1][0][1]&&d[1][0][1][0])return d[1][0][1][0];}catch(e){}
+  return null;
+}
+function handleName(val){
+  if(S.lang==='en'){validate();return;}
+  hideSuggestion();clearTimeout(tlTimer);
+  if(!val.trim())return;
+  tlTimer=setTimeout(async()=>{
+    const r=await fetchTranslit(val.trim(),S.lang);
+    if(r&&r!==val){S.translitResult=r;document.getElementById('ts-roman').textContent=val;document.getElementById('ts-native').textContent=r;document.getElementById('translit-box').classList.add('show');}
+  },380);
+}
+function hideSuggestion(){document.getElementById('translit-box').classList.remove('show');S.translitResult='';}
+function acceptTranslit(){
+  S.acceptedName=S.translitResult;
+  document.getElementById('accepted-name-val').textContent=S.translitResult;
+  document.getElementById('accepted-box').classList.add('show');
+  document.getElementById('translit-box').classList.remove('show');
+  document.getElementById('name-input').value='';
+  validate();
+}
+function discardTranslit(){hideSuggestion();}
+function editName(){
+  S.acceptedName='';
+  document.getElementById('accepted-box').classList.remove('show');
+  document.getElementById('name-input').value='';
+  document.getElementById('name-input').focus();
+  validate();
+}
+
+// NUMPAD
+function np(f,d){
+  if(f==='age'){if(S.age.length>=3)return;S.age+=d;const e=document.getElementById('age-disp');e.textContent=S.age;e.classList.remove('empty');}
+  else{if(S.phone.length>=10)return;S.phone+=d;const e=document.getElementById('phone-disp');e.textContent=fmt(S.phone);e.classList.remove('empty');}
+  validate();
+}
+function nd(f){
+  if(f==='age'){S.age=S.age.slice(0,-1);const e=document.getElementById('age-disp');if(S.age){e.textContent=S.age;e.classList.remove('empty');}else{e.textContent='—';e.classList.add('empty');}}
+  else{S.phone=S.phone.slice(0,-1);const e=document.getElementById('phone-disp');if(S.phone){e.textContent=fmt(S.phone);e.classList.remove('empty');}else{e.textContent='— — — — — — — — — —';e.classList.add('empty');}}
+  validate();
+}
+function fmt(p){const s=p.padEnd(10,'—');return s.slice(0,5)+' '+s.slice(5,10);}
+
+// VALIDATION
+function nameOk(){return S.lang==='en'?document.getElementById('name-input').value.trim().length>1:S.acceptedName.length>0;}
+function validate(){
+  const nOk=nameOk(),aOk=S.age.length>0,pOk=S.phone.length===10,oOk=S.opd!=='';
+  const fn=S.lang==='en'?document.getElementById('name-input').value.trim():S.acceptedName;
+  setV('v-name',nOk,fn||'—');setV('v-age',aOk,S.age?S.age+' yrs':'—');setV('v-phone',pOk,S.phone?'+91 '+fmt(S.phone):'—');setV('v-opd',oOk,S.opd||'—');
+  document.getElementById('submit-btn').disabled=!(nOk&&aOk&&pOk&&oOk);
+  let done=0;if(nOk)done++;if(aOk)done++;if(pOk)done++;if(oOk)done++;
+  for(let i=1;i<=4;i++){const e=document.getElementById('sd'+i);e.className='step-dot'+(i<=done?' done':'')+(i===done+1&&done<4?' active':'');}
+}
+function setV(id,ok,val){document.getElementById(id).className='val-row'+(ok?' ok':'');document.getElementById(id+'-val').textContent=val;}
+
+// LANG
+function setLang(lang,btn){
+  S.lang=lang;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  applyLabels(lang);resetName();buildOpdGrid();validate();
+}
+function applyLabels(lang){
+  const L=LABELS[lang];
+  const ids={'sh-name':L.shName,'sh-opd':L.shOpd,'lbl-name':L.lblName,'lbl-name-native':L.lblNameNative,'lbl-opd':L.lblOpd,'hint-text':L.hintText,'rh-title':L.rhTitle,'rh-sub':L.rhSub,'npl-age':L.nplAge,'npl-phone':L.nplPhone,'vt-title':L.vtTitle,'v-name-lbl':L.vNameLbl,'v-age-lbl':L.vAgeLbl,'v-phone-lbl':L.vPhoneLbl,'v-opd-lbl':L.vOpdLbl,'submit-lbl':L.submitLbl,'submit-note':L.submitNote,'tok-badge-lbl':L.tokBadge,'tib-age-lbl':L.tibAge,'tib-phone-lbl':L.tibPhone,'tib-time-lbl':L.tibTime,'btn-print-lbl':L.btnPrint,'btn-new-lbl':L.btnNew,'step-label-text':L.stepLabel};
+  Object.entries(ids).forEach(([id,val])=>{const e=document.getElementById(id);if(e)e.textContent=val;});
+  document.getElementById('name-input').placeholder=lang==='en'?'Type name here...':'Type name in English...';
+}
+function resetName(){S.acceptedName='';S.translitResult='';document.getElementById('name-input').value='';document.getElementById('translit-box').classList.remove('show');document.getElementById('accepted-box').classList.remove('show');}
+
+// SUBMIT
+function submitForm(){
+  const opd=S.opd;if(!opd)return;
+  S.tokenCounters[opd]=(S.tokenCounters[opd]||0)+1;
+  const tokenId=opd.slice(0,2)+S.tokenCounters[opd].toString().padStart(3,'0');
+  const dept=DEPTS.find(d=>d.code===opd);
+  const deptName=dept?(S.lang==='en'?dept.en:dept[S.lang]||dept.en):opd;
+  const finalName=S.lang==='en'?document.getElementById('name-input').value.trim():S.acceptedName;
+  const L=LABELS[S.lang];
+  const now=new Date();
+  const timeStr=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  document.getElementById('tok-greeting').textContent=L.greeting+',';
+  document.getElementById('tok-name').textContent=finalName;
+  document.getElementById('tok-number').textContent=tokenId;
+  document.getElementById('tok-dept').textContent=deptName;
+  document.getElementById('tib-age').textContent=S.age;
+  document.getElementById('tib-phone').textContent='+91'+S.phone.slice(0,5)+'…';
+  document.getElementById('tib-time').textContent=timeStr;
+  document.getElementById('pr-dept').textContent=deptName.toUpperCase();
+  document.getElementById('pr-token').textContent=tokenId;
+  document.getElementById('pr-name').textContent=finalName;
+  document.getElementById('pr-details').textContent='Age: '+S.age+' | Ph: +91'+S.phone;
+  document.getElementById('pr-time').textContent='Time: '+timeStr;
+  document.getElementById('overlay').classList.add('show');
+}
+function doPrint(){const w=window.open('','_blank','width=320,height=420');w.document.write('<html><body>'+document.getElementById('print-area').innerHTML+'</body></html>');w.document.close();w.focus();w.print();w.close();}
+function resetForm(){
+  S.acceptedName='';S.age='';S.phone='';S.opd='';S.translitResult='';
+  document.getElementById('name-input').value='';
+  document.getElementById('translit-box').classList.remove('show');
+  document.getElementById('accepted-box').classList.remove('show');
+  document.getElementById('age-disp').textContent='—';document.getElementById('age-disp').classList.add('empty');
+  document.getElementById('phone-disp').textContent='— — — — — — — — — —';document.getElementById('phone-disp').classList.add('empty');
+  document.getElementById('overlay').classList.remove('show');
+  buildOpdGrid();validate();
+}
+
+// API CHECK
+async function checkApi(){
+  try{const r=await fetchTranslit('test','hi');const pill=document.getElementById('api-pill');if(r){pill.className='api-pill ready';document.getElementById('api-text').textContent='Online';}else throw new Error();}
+  catch(e){document.getElementById('api-pill').className='api-pill error';document.getElementById('api-text').textContent='Offline';}
+}
+
+// INIT
+applyLabels('en');buildOpdGrid();validate();checkApi();
+document.getElementById('name-input').addEventListener('input',function(){if(S.lang==='en')validate();});
+</script>
+</body>
+</html>
